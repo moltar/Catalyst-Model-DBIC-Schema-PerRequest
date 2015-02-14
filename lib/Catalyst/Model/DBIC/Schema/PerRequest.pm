@@ -64,12 +64,12 @@ sub build_per_context_instance {
 
     my $new = bless({%$target}, ref($target));
 
-    $new->schema($self->per_request_schema($ctx, $new->schema, $new));
+    $new->schema($self->per_request_schema($ctx, $new));
 
     return $new;
 }
 
-=head2 per_request_schema($c, $schema, $original_model)
+=head2 per_request_schema($c, $original_model)
 
 This method is called automatically and will clone your schema with attributes
 coming from L<per_request_schema_attributes>. You can override this method
@@ -80,9 +80,9 @@ C<per_request_schema_attributes>.
 
 # Thanks to Matt Trout (mst) for this idea
 sub per_request_schema {
-    my ($self, $c, $schema, $original_model) = @_;
+    my ($self, $c, $original_model) = @_;
 
-    return $schema->clone(
+    return $original_model->schema->clone(
         $self->per_request_schema_attributes($c, $original_model));
 }
 
