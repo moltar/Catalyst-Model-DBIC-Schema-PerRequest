@@ -8,7 +8,7 @@ with 'Catalyst::Component::InstancePerContext';
 
 use Carp qw(croak confess);
 
-use version; our $VERSION = version->new('v0.1.0');
+our $VERSION = '0.001001';
 
 =head1 DESCRIPTION
 
@@ -50,20 +50,20 @@ has target_model => (
 sub build_per_context_instance {
     my ($self, $ctx) = @_;
 
-    croak
-        "This is a per-request only model, calling it on the app makes no sense"
+    croak ref($self)
+        . ' is a per-request only model, calling it on the app makes no sense.'
         unless blessed($ctx);
 
     my $target = $ctx->model($self->target_model);
 
     my $new = bless({%$target}, ref($target));
 
-    $new->schema($self->per_request_schema($new->schema, $ctx));
+    $new->schema($self->per_request_schema($ctx, $new->schema, $new));
 
     return $new;
 }
 
-=head2 per_request_schema($c)
+=head2 per_request_schema($c, $schema, $original_model)
 
 This method is called automatically and will clone your schema with attributes
 coming from L<per_request_schema_attributes>. You can override this method
@@ -74,12 +74,13 @@ C<per_request_schema_attributes>.
 
 # Thanks to Matt Trout (mst) for this idea
 sub per_request_schema {
-    my ($self, $schema, $c) = @_;
+    my ($self, $c, $schema, $original_model) = @_;
 
-    return $schema->clone($self->per_request_schema_attributes($c));
+    return $schema->clone(
+        $self->per_request_schema_attributes($c, $original_model));
 }
 
-=head2 per_request_schema_attributes($c)
+=head2 per_request_schema_attributes($c, $original_model)
 
 Override this method in your child class and return whatever parameters you
 need for new schema instance.
@@ -92,7 +93,7 @@ need for new schema instance.
 =cut
 
 sub per_request_schema_attributes {
-    my ($self, $c) = @_;
+    my ($self, $c, $original_model) = @_;
 
     confess
         "Either per_request_schema_attributes needs to be created, or per_request_schema needs to be overridden!";
