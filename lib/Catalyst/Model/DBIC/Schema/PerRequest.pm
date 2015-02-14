@@ -1,6 +1,6 @@
 package Catalyst::Model::DBIC::Schema::PerRequest;
 
-# ABSTRACT: Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model with additional parameters
+# ABSTRACT: Per request clone of a DBIC model with additional parameters
 
 use Moose;
 extends 'Catalyst::Model';
@@ -39,7 +39,13 @@ model with additional parameters passed to the L<DBIx::Class::Schema> clone.
 
 =head2 target_model
 
+The name of the original model class.
 
+ __PACKAGE__->config(target_model => 'DB');
+
+or
+
+ has '+target_model' => (default => 'DB');
 
 =cut
 
