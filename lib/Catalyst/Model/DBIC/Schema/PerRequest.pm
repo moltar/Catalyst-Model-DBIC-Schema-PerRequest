@@ -1,6 +1,6 @@
 package Catalyst::Model::DBIC::Schema::PerRequest;
 
-# ABSTRACT: Catalyst::Model::DBIC::Schema::PerRequest
+# ABSTRACT: Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model with additional parameters
 
 use Moose;
 extends 'Catalyst::Model';
@@ -10,10 +10,7 @@ use Carp qw(croak confess);
 
 our $VERSION = '0.001001';
 
-=head1 DESCRIPTION
-
-Allows you to get a clone of an existing L<Catalyst::Model::DBIC::Schema>
-model with additional parameters passed to the L<DBIx::Class::Schema> clone.
+=head1 SYNOPSIS
 
  package MyApp::Model::RestrictedDB;
 
@@ -26,6 +23,15 @@ model with additional parameters passed to the L<DBIx::Class::Schema> clone.
      my ($self, $c) = @_;
      return (restricting_object => $c->user->obj);
  }
+
+In your controller:
+
+ $c->model('RestrictedDB')->resultset('...');
+
+=head1 DESCRIPTION
+
+Allows you to get a clone of an existing L<Catalyst::Model::DBIC::Schema>
+model with additional parameters passed to the L<DBIx::Class::Schema> clone.
 
 =cut
 
@@ -86,7 +92,7 @@ Override this method in your child class and return whatever parameters you
 need for new schema instance.
 
  sub per_request_schema_attributes {
-     my ($self, $c) = @_;
+     my ($self, $c, $original_model) = @_;
      return (restricting_object => $c->user->obj);
  }
 
@@ -98,5 +104,11 @@ sub per_request_schema_attributes {
     confess
         "Either per_request_schema_attributes needs to be created, or per_request_schema needs to be overridden!";
 }
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to mst (Matt S. Trout) for the idea and mentorship during the development.
+
+=cut
 
 1;    ## eof
