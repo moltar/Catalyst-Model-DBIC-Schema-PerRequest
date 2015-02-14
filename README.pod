@@ -1,0 +1,74 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Catalyst::Model::DBIC::Schema::PerRequest - Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model with additional parameters
+
+=head1 VERSION
+
+version 0.001001
+
+=head1 SYNOPSIS
+
+ package MyApp::Model::RestrictedDB;
+
+ use Moose;
+ extends 'Catalyst::Model::DBIC::Schema::PerRequest';
+
+ __PACKAGE__->config(target_model => 'DB');
+
+ sub per_request_schema_attributes {
+     my ($self, $c) = @_;
+     return (restricting_object => $c->user->obj);
+ }
+
+In your controller:
+
+ $c->model('RestrictedDB')->resultset('...');
+
+=head1 DESCRIPTION
+
+Allows you to get a clone of an existing L<Catalyst::Model::DBIC::Schema>
+model with additional parameters passed to the L<DBIx::Class::Schema> clone.
+
+=head1 ATTRIBUTES
+
+=head2 target_model
+
+=head1 METHODS
+
+=head2 per_request_schema($c, $schema, $original_model)
+
+This method is called automatically and will clone your schema with attributes
+coming from L<per_request_schema_attributes>. You can override this method
+directly to return a schema you want, but it's probably better to override
+C<per_request_schema_attributes>.
+
+=head2 per_request_schema_attributes($c, $original_model)
+
+Override this method in your child class and return whatever parameters you
+need for new schema instance.
+
+ sub per_request_schema_attributes {
+     my ($self, $c, $original_model) = @_;
+     return (restricting_object => $c->user->obj);
+ }
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to mst (Matt S. Trout) for the idea and mentorship during the development.
+
+=head1 AUTHOR
+
+Roman F. <romanf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Roman F..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
