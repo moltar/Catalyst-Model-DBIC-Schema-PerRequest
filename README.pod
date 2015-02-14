@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Catalyst::Model::DBIC::Schema::PerRequest - Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model with additional parameters
+Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model with additional parameters
 
 =head1 VERSION
 
@@ -37,9 +37,17 @@ model with additional parameters passed to the L<DBIx::Class::Schema> clone.
 
 =head2 target_model
 
+The name of the original model class.
+
+ __PACKAGE__->config(target_model => 'DB');
+
+or
+
+ has '+target_model' => (default => 'DB');
+
 =head1 METHODS
 
-=head2 per_request_schema($c, $schema, $original_model)
+=head2 per_request_schema($c, $original_model)
 
 This method is called automatically and will clone your schema with attributes
 coming from L<per_request_schema_attributes>. You can override this method
