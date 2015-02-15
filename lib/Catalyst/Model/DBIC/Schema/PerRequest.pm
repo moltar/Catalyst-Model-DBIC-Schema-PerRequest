@@ -9,7 +9,7 @@ with 'Catalyst::Component::InstancePerContext';
 use Carp qw(croak confess);
 use Module::Runtime qw(use_module);
 
-our $VERSION = '0.001001';
+our $VERSION = '0.002001';
 
 =head1 SYNOPSIS
 
@@ -41,8 +41,6 @@ model with additional parameters passed to the L<DBIx::Class::Schema> clone.
 =head2 target_model
 
 The name of the original model class.
-
- __PACKAGE__->config(target_model => 'DB');
 
 or
 
