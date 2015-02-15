@@ -33,6 +33,12 @@ sub index :Path :Args(0) {
     $c->response->body($c->model('DBPerRequest')->schema->test_attr);
 }
 
+sub model_result : Local {
+    my ( $self, $c ) = @_;
+
+    $c->response->body($c->model('DBPerRequest::Artist')->can('search_rs') ? 1 : 0);
+}
+
 =head2 default
 
 Standard 404 error page

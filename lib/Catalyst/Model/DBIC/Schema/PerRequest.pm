@@ -7,6 +7,7 @@ extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 use Carp qw(croak confess);
+use Module::Runtime qw(use_module);
 
 our $VERSION = '0.001001';
 
@@ -45,7 +46,10 @@ The name of the original model class.
 
 or
 
- has '+target_model' => (default => 'DB');
+ has '+target_model' => (
+     default      => 'DB',
+     schema_class => 'MyApp::Schema',
+ );
 
 =cut
 
@@ -55,9 +59,75 @@ has target_model => (
     required => 1,
 );
 
+=head2 schema_class
+
+The name of your L<DBIx::Class> schema.
+
+=cut
+
+has schema_class => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+);
+
+#--------------------------------------------------------------------------#
+# model_name
+#--------------------------------------------------------------------------#
+
+has model_name => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_model_name',
+);
+
+sub _build_model_name {
+    my $self = shift;
+
+    my $class = ref($self);
+    (my $model_name = $class) =~ s/^[\w:]+::(?:Model|M):://;
+
+    return $model_name;
+}
+
 =head1 METHODS
 
 =cut
+
+#--------------------------------------------------------------------------#
+# BUILD
+#--------------------------------------------------------------------------#
+
+our %subnamespaces;
+sub BUILD {
+    my ($self) = @_;
+
+    unless ($subnamespaces{ ref($self) }) {
+        $self->setup_subnamespaces;
+        $subnamespaces{ ref($self) } = 1;
+    }
+}
+
+#--------------------------------------------------------------------------#
+# setup_subnamespaces
+#--------------------------------------------------------------------------#
+
+sub setup_subnamespaces {
+    my ($self) = @_;
+
+    my $model_name = $self->model_name;
+    foreach my $source_name (use_module($self->schema_class)->sources) {
+        no strict 'refs';
+        *{ ref($self) . '::' . $source_name . '::ACCEPT_CONTEXT' } = sub {
+            $_[1]->model($model_name)->schema->resultset($source_name);
+        };
+    }
+}
+
+#--------------------------------------------------------------------------#
+# build_per_context_instance
+#--------------------------------------------------------------------------#
 
 sub build_per_context_instance {
     my ($self, $ctx) = @_;
