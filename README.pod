@@ -8,7 +8,7 @@ Catalyst::Model::DBIC::Schema::PerRequest - Per request clone of a DBIC model wi
 
 =head1 VERSION
 
-version 0.001001
+version 0.002001
 
 =head1 SYNOPSIS
 
@@ -39,11 +39,16 @@ model with additional parameters passed to the L<DBIx::Class::Schema> clone.
 
 The name of the original model class.
 
- __PACKAGE__->config(target_model => 'DB');
-
 or
 
- has '+target_model' => (default => 'DB');
+ has '+target_model' => (
+     default      => 'DB',
+     schema_class => 'MyApp::Schema',
+ );
+
+=head2 schema_class
+
+The name of your L<DBIx::Class> schema.
 
 =head1 METHODS
 
