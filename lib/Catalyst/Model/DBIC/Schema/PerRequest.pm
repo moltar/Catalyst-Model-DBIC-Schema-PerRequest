@@ -9,7 +9,7 @@ with 'Catalyst::Component::InstancePerContext';
 use Carp qw(croak confess);
 use Module::Runtime qw(use_module);
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 =head1 SYNOPSIS
 
